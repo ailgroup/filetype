@@ -1,18 +1,18 @@
-package matchers
+package filetype
 
 var (
-	TypeMp4  = newType("mp4", "video/mp4")
-	TypeM4v  = newType("m4v", "video/x-m4v")
-	TypeMkv  = newType("mkv", "video/x-matroska")
-	TypeWebm = newType("webm", "video/webm")
-	TypeMov  = newType("mov", "video/quicktime")
-	TypeAvi  = newType("avi", "video/x-msvideo")
-	TypeWmv  = newType("wmv", "video/x-ms-wmv")
-	TypeMpeg = newType("mpg", "video/mpeg")
-	TypeFlv  = newType("flv", "video/x-flv")
+	TypeMp4  = NewType("mp4", "video/mp4")
+	TypeM4v  = NewType("m4v", "video/x-m4v")
+	TypeMkv  = NewType("mkv", "video/x-matroska")
+	TypeWebm = NewType("webm", "video/webm")
+	TypeMov  = NewType("mov", "video/quicktime")
+	TypeAvi  = NewType("avi", "video/x-msvideo")
+	TypeWmv  = NewType("wmv", "video/x-ms-wmv")
+	TypeMpeg = NewType("mpg", "video/mpeg")
+	TypeFlv  = NewType("flv", "video/x-flv")
 )
 
-var Video = Map{
+var Video = MapOfMatcherFunc{
 	TypeMp4:  Mp4,
 	TypeM4v:  M4v,
 	TypeMkv:  Mkv,

@@ -1,19 +1,19 @@
-package matchers
+package filetype
 
 var (
-	TypeJpeg = newType("jpg", "image/jpeg")
-	TypePng  = newType("png", "image/png")
-	TypeGif  = newType("gif", "image/gif")
-	TypeWebp = newType("webp", "image/webp")
-	TypeCR2  = newType("cr2", "image/x-canon-cr2")
-	TypeTiff = newType("tif", "image/tiff")
-	TypeBmp  = newType("bmp", "image/bmp")
-	TypeJxr  = newType("jxr", "image/vnd.ms-photo")
-	TypePsd  = newType("psd", "image/vnd.adobe.photoshop")
-	TypeIco  = newType("ico", "image/x-icon")
+	TypeJpeg = NewType("jpg", "image/jpeg")
+	TypePng  = NewType("png", "image/png")
+	TypeGif  = NewType("gif", "image/gif")
+	TypeWebp = NewType("webp", "image/webp")
+	TypeCR2  = NewType("cr2", "image/x-canon-cr2")
+	TypeTiff = NewType("tif", "image/tiff")
+	TypeBmp  = NewType("bmp", "image/bmp")
+	TypeJxr  = NewType("jxr", "image/vnd.ms-photo")
+	TypePsd  = NewType("psd", "image/vnd.adobe.photoshop")
+	TypeIco  = NewType("ico", "image/x-icon")
 )
 
-var Image = Map{
+var Image = MapOfMatcherFunc{
 	TypeJpeg: Jpeg,
 	TypePng:  Png,
 	TypeGif:  Gif,

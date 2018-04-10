@@ -1,4 +1,4 @@
-package types
+package filetype
 
 import "testing"
 
@@ -18,10 +18,10 @@ func TestSplit(t *testing.T) {
 	for _, test := range cases {
 		kind, subtype := splitMime(test.mime)
 		if test.kind != kind {
-			t.Fatalf("Invalid kind: %s", test.kind)
+			t.Errorf("Invalid kind: %s", test.kind)
 		}
 		if test.subtype != subtype {
-			t.Fatalf("Invalid subtype: %s", test.subtype)
+			t.Errorf("Invalid subtype: %s", test.subtype)
 		}
 	}
 }

@@ -5,9 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"testing"
-
-	"gopkg.in/h2non/filetype.v1/matchers"
-	"gopkg.in/h2non/filetype.v1/types"
 )
 
 func TestMatch(t *testing.T) {
@@ -21,7 +18,7 @@ func TestMatch(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		match, err := Match(test.buf)
+		match, err := MatchBuffer(test.buf)
 		if err != nil {
 			t.Fatalf("Error: %s", err)
 		}
@@ -46,7 +43,7 @@ func TestMatchFile(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		kind, _ := MatchFile("./fixtures/sample." + test.ext)
+		kind, _ := MatchFile("./test_data/sample." + test.ext)
 		if kind.Extension != test.ext {
 			t.Fatalf("Invalid image type: %s != %s", kind.Extension, test.ext)
 		}
@@ -93,9 +90,9 @@ func TestMatches(t *testing.T) {
 }
 
 func TestAddMatcher(t *testing.T) {
-	fileType := AddType("foo", "foo/foo")
+	fileType := NewType("foo", "foo/foo")
 
-	AddMatcher(fileType, func(buf []byte) bool {
+	NewMatcher(fileType, func(buf []byte) bool {
 		return len(buf) == 2 && buf[0] == 0x00 && buf[1] == 0x00
 	})
 
@@ -115,32 +112,15 @@ func TestAddMatcher(t *testing.T) {
 func TestMatchMap(t *testing.T) {
 	cases := []struct {
 		buf  []byte
-		kind types.Type
+		kind Typed
 	}{
-		{[]byte{0xFF, 0xD8, 0xFF}, types.Get("jpg")},
-		{[]byte{0x89, 0x50, 0x4E, 0x47}, types.Get("png")},
+		{[]byte{0xFF, 0xD8, 0xFF}, GetByExtension("jpg")},
+		{[]byte{0x89, 0x50, 0x4E, 0x47}, GetByExtension("png")},
 		{[]byte{0xFF, 0x0, 0x0}, Unknown},
 	}
 
 	for _, test := range cases {
-		if kind := MatchMap(test.buf, matchers.Image); kind != test.kind {
-			t.Fatalf("Do not matches: %#v", test.buf)
-		}
-	}
-}
-
-func TestMatchesMap(t *testing.T) {
-	cases := []struct {
-		buf   []byte
-		match bool
-	}{
-		{[]byte{0xFF, 0xD8, 0xFF}, true},
-		{[]byte{0x89, 0x50, 0x4E, 0x47}, true},
-		{[]byte{0xFF, 0x0, 0x0}, false},
-	}
-
-	for _, test := range cases {
-		if match := MatchesMap(test.buf, matchers.Image); match != test.match {
+		if kind := MatchMap(test.buf, Image); kind != test.kind {
 			t.Fatalf("Do not matches: %#v", test.buf)
 		}
 	}
@@ -158,30 +138,30 @@ var pngBuffer, _ = ioutil.ReadFile("./fixtures/sample.png")
 
 func BenchmarkMatchTar(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Match(tarBuffer)
+		MatchBuffer(tarBuffer)
 	}
 }
 
 func BenchmarkMatchZip(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Match(zipBuffer)
+		MatchBuffer(zipBuffer)
 	}
 }
 
 func BenchmarkMatchJpeg(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Match(jpgBuffer)
+		MatchBuffer(jpgBuffer)
 	}
 }
 
 func BenchmarkMatchGif(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Match(gifBuffer)
+		MatchBuffer(gifBuffer)
 	}
 }
 
 func BenchmarkMatchPng(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Match(pngBuffer)
+		MatchBuffer(pngBuffer)
 	}
 }

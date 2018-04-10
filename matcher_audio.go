@@ -1,16 +1,16 @@
-package matchers
+package filetype
 
 var (
-	TypeMidi = newType("mid", "audio/midi")
-	TypeMp3  = newType("mp3", "audio/mpeg")
-	TypeM4a  = newType("m4a", "audio/m4a")
-	TypeOgg  = newType("ogg", "audio/ogg")
-	TypeFlac = newType("flac", "audio/x-flac")
-	TypeWav  = newType("wav", "audio/x-wav")
-	TypeAmr  = newType("amr", "audio/amr")
+	TypeMidi = NewType("mid", "audio/midi")
+	TypeMp3  = NewType("mp3", "audio/mpeg")
+	TypeM4a  = NewType("m4a", "audio/m4a")
+	TypeOgg  = NewType("ogg", "audio/ogg")
+	TypeFlac = NewType("flac", "audio/x-flac")
+	TypeWav  = NewType("wav", "audio/x-wav")
+	TypeAmr  = NewType("amr", "audio/amr")
 )
 
-var Audio = Map{
+var Audio = MapOfMatcherFunc{
 	TypeMidi: Midi,
 	TypeMp3:  Mp3,
 	TypeM4a:  M4a,

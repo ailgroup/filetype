@@ -2,8 +2,6 @@ package filetype
 
 import (
 	"testing"
-
-	"gopkg.in/h2non/filetype.v1/types"
 )
 
 func TestIs(t *testing.T) {
@@ -27,12 +25,12 @@ func TestIs(t *testing.T) {
 func TestIsType(t *testing.T) {
 	cases := []struct {
 		buf   []byte
-		kind  types.Type
+		kind  Typed
 		match bool
 	}{
-		{[]byte{0xFF, 0xD8, 0xFF}, types.Get("jpg"), true},
-		{[]byte{0xFF, 0xD8, 0x00}, types.Get("jpg"), false},
-		{[]byte{0x89, 0x50, 0x4E, 0x47}, types.Get("png"), true},
+		{[]byte{0xFF, 0xD8, 0xFF}, GetByExtension("jpg"), true},
+		{[]byte{0xFF, 0xD8, 0x00}, GetByExtension("jpg"), false},
+		{[]byte{0x89, 0x50, 0x4E, 0x47}, GetByExtension("png"), true},
 	}
 
 	for _, test := range cases {
@@ -99,7 +97,7 @@ func TestIsMIMESupported(t *testing.T) {
 }
 
 func TestAddType(t *testing.T) {
-	AddType("foo", "foo/foo")
+	NewType("foo", "foo/foo")
 
 	if !IsSupported("foo") {
 		t.Fatalf("Not supported extension")
@@ -111,12 +109,12 @@ func TestAddType(t *testing.T) {
 }
 
 func TestGetType(t *testing.T) {
-	jpg := GetType("jpg")
-	if jpg == types.Unknown {
+	jpg := GetByExtension("jpg")
+	if jpg == Unknown {
 		t.Fatalf("Type should be supported")
 	}
 
-	invalid := GetType("invalid")
+	invalid := GetByExtension("invalid")
 	if invalid != Unknown {
 		t.Fatalf("Type should not be supported")
 	}

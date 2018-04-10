@@ -3,84 +3,103 @@ package filetype
 import (
 	"io"
 	"os"
-
-	"gopkg.in/h2non/filetype.v1/matchers"
-	"gopkg.in/h2non/filetype.v1/types"
 )
 
-// Matchers is an alias to matchers.Matchers
-var Matchers = matchers.Matchers
+// Matcher function interface as type alias
+type MatcherFunc func([]byte) bool
 
-// NewMatcher is an alias to matchers.NewMatcher
-var NewMatcher = matchers.NewMatcher
+// Type interface to store pairs of type with its matcher function
+type MapOfMatcherFunc map[Typed]MatcherFunc
+
+// Type specific matcher function interface
+type TypeMatcherFunc func([]byte) Typed
+
+// Store registered file type matchers
+var Matchers = make(map[Typed]TypeMatcherFunc)
+
+func register(mmapFunc ...MapOfMatcherFunc) {
+	for _, m := range mmapFunc {
+		for kind, matchr := range m {
+			NewMatcher(kind, matchr)
+		}
+	}
+}
+
+func init() {
+	// Arguments order is intentional
+	register(Image, Video, Audio, Font, Document, Archive)
+}
+
+// AddMatcher registers a new matcher type
+//func AddMatcher(fileType Typed, mFunc MatcherFunc) TypeMatcherFunc {
+//	return NewMatcher(fileType, mFunc)
+//}
+
+// Create and register a new type matcher function
+func NewMatcher(t Typed, fn MatcherFunc) TypeMatcherFunc {
+	matcher := func(buf []byte) Typed {
+		if fn(buf) {
+			return t
+		}
+		return Unknown
+	}
+
+	Matchers[t] = matcher
+	return matcher
+}
 
 // Match infers the file type of a given buffer inspecting its magic numbers signature
-func Match(buf []byte) (types.Type, error) {
+func MatchBuffer(buf []byte) (Typed, error) {
 	length := len(buf)
 	if length == 0 {
-		return types.Unknown, ErrEmptyBuffer
+		return Unknown, ErrEmptyBuffer
 	}
 
 	for _, checker := range Matchers {
 		match := checker(buf)
-		if match != types.Unknown && match.Extension != "" {
+		if match != Unknown && match.Extension != "" {
 			return match, nil
 		}
 	}
 
-	return types.Unknown, nil
+	return Unknown, nil
 }
 
-// Get is an alias to Match()
-func Get(buf []byte) (types.Type, error) {
-	return Match(buf)
+// MatchReader is convenient wrapper to MatchBuffer() any Reader
+func MatchReader(reader io.Reader) (Typed, error) {
+	buffer := make([]byte, 512)
+
+	_, err := reader.Read(buffer)
+	if err != nil && err != io.EOF {
+		return Unknown, err
+	}
+
+	return MatchBuffer(buffer)
 }
 
 // MatchFile infers a file type for a file
-func MatchFile(filepath string) (types.Type, error) {
+func MatchFile(filepath string) (Typed, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
-		return types.Unknown, err
+		return Unknown, err
 	}
 	defer file.Close()
 
 	return MatchReader(file)
 }
 
-// MatchReader is convenient wrapper to Match() any Reader
-func MatchReader(reader io.Reader) (types.Type, error) {
-	buffer := make([]byte, 512)
-
-	_, err := reader.Read(buffer)
-	if err != nil && err != io.EOF {
-		return types.Unknown, err
-	}
-
-	return Match(buffer)
-}
-
-// AddMatcher registers a new matcher type
-func AddMatcher(fileType types.Type, matcher matchers.Matcher) matchers.TypeMatcher {
-	return matchers.NewMatcher(fileType, matcher)
-}
-
 // Matches checks if the given buffer matches with some supported file type
 func Matches(buf []byte) bool {
-	kind, _ := Match(buf)
-	return kind != types.Unknown
+	kind, _ := MatchBuffer(buf)
+	return kind != Unknown
 }
 
 // MatchMap performs a file matching againts a map of match functions
-func MatchMap(buf []byte, matchers matchers.Map) types.Type {
-	for kind, matcher := range matchers {
+func MatchMap(buf []byte, mmapFunc MapOfMatcherFunc) Typed {
+	for kind, matcher := range mmapFunc {
 		if matcher(buf) {
 			return kind
 		}
 	}
-	return types.Unknown
-}
-
-// MatchesMap is an alias to Matches() but using matching againts a map of match functions
-func MatchesMap(buf []byte, matchers matchers.Map) bool {
-	return MatchMap(buf, matchers) != types.Unknown
+	return Unknown
 }

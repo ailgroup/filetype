@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestKind(t *testing.T) {
+func TestKindImage(t *testing.T) {
 	var cases = []struct {
 		buf []byte
 		ext string
@@ -15,14 +15,14 @@ func TestKind(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		kind, _ := Image(test.buf)
+		kind, _ := MatchImage(test.buf)
 		if kind.Extension != test.ext {
-			t.Fatalf("Invalid match: %s != %s", kind.Extension, test.ext)
+			t.Errorf("Invalid match: %s != %s", kind.Extension, test.ext)
 		}
 	}
 }
 
-func TestIsKind(t *testing.T) {
+func TestKindIsImage(t *testing.T) {
 	var cases = []struct {
 		buf   []byte
 		match bool
@@ -34,7 +34,7 @@ func TestIsKind(t *testing.T) {
 
 	for _, test := range cases {
 		if IsImage(test.buf) != test.match {
-			t.Fatalf("Invalid match: %t", test.match)
+			t.Errorf("Invalid match: %t", test.match)
 		}
 	}
 }

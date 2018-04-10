@@ -1,13 +1,13 @@
-package matchers
+package filetype
 
 var (
-	TypeWoff  = newType("woff", "application/font-woff")
-	TypeWoff2 = newType("woff2", "application/font-woff")
-	TypeTtf   = newType("ttf", "application/font-sfnt")
-	TypeOtf   = newType("otf", "application/font-sfnt")
+	TypeWoff  = NewType("woff", "application/font-woff")
+	TypeWoff2 = NewType("woff2", "application/font-woff")
+	TypeTtf   = NewType("ttf", "application/font-sfnt")
+	TypeOtf   = NewType("otf", "application/font-sfnt")
 )
 
-var Font = Map{
+var Font = MapOfMatcherFunc{
 	TypeWoff:  Woff,
 	TypeWoff2: Woff2,
 	TypeTtf:   Ttf,
